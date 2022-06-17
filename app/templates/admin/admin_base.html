@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+
+{% block Content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-2 entry-box" style="background-color: ">
+            <ul class="nav nav-list">
+				<li class="nav-header">manage post</li>
+				<li><a href="{{ url_for('admin.submitArticles') }}">post</a></li>
+				<li><a href="{{ url_for('admin.manage_articles') }}">manage post</a></li>
+				<li><a href="{{ url_for('admin.manage_articleTypes') }}">post category</a></li>
+
+				<li class="nav-header">manage comment</li>
+				<li><a href="{{ url_for('admin.manage_comments') }}">post comment</a></li>
+
+                <li class="nav-header">blog setting</li>
+				<li><a href="{{ url_for('admin.custom_blog_info') }}">basic information</a></li>
+{#				<li><a href="{{ url_for('admin.custom_blog_plugin') }}">manage plugins</a></li>#}
+{#				<li><a href="{{ url_for('admin.add_plugin') }}">add plugin</a></li>#}
+
+				<li class="nav-header">others</li>
+				<li><a href="{{ url_for('admin.account') }}">user account</a></li>
+				<li><a href="{{ url_for('admin.help') }}">help</a></li>
+			</ul>
+        </div>
+        <div class="col-md-10">
+            {% for category, message in get_flashed_messages(with_categories=true) %}
+                <div class="alert alert-{{category}} alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% block admin_content %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% import 'bootstrap/wtf.html' as wtf %}
+
+<div class="row">
+    <div class="col-md-8" id="submit-comment-container">
+        <form class="submit-comment-form" id="submit-comment-form" method="post" action="">
+            {{ form.csrf_token }}
+            {{ form.follow(type='hidden') }}
+            {{ form.name.label }}{{ form.name(class='form-control', required='', value=current_user.username) }}
+            {{ form.email.label }}{{ form.email(class='form-control', required='', value=current_user.email) }}
+            {{ form.content.label }}{{ form.content(class='form-control', required='') }}
+            <button type="submit" class="btn btn-default">
+                submit
+            </button>
+        </form>
+    </div>
+</div>

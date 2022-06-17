@@ -1,0 +1,108 @@
+<ul class="comments">
+    {% if comments %}
+        {% for comment in comments %}
+        <li class="comment">
+            {% if comment.comment_type == 'reply' %}
+                <p class="comment-reply-info">
+                    <span class="glyphicon glyphicon-envelope"></span>
+                    reply to<strong><i>
+                    {% if comment.followed_name() %}
+                        {{ comment.followed_name() }}
+                    {% else %}
+                        {{ comment.reply_to }}
+                        ({{ comment.reply_to }}'s comment had been deleted'！)
+                    {% endif %}
+                    ：</i></strong>
+                </p>
+            {% endif %}
+            <div class="comment-thumbnail">
+                <img class="img-rounded profile-thumbnail" src="{{ comment.gravatar() }}">
+            </div>
+            <div class="comment-info">
+                <div class="comment-date"><span>{{ moment(comment.timestamp.replace(microsecond=0)).format('LLL') }}</span></div>
+                <div class="comment-author">
+                    <span>{{ comment.author_name }}</span>
+                    {% if User.query.filter_by(email=comment.author_email).count() %}
+                        <span class="glyphicon glyphicon-user">admin</span>
+                    {% endif %}
+                </div>
+                <div class="comment-content">
+                    {% if comment.disabled == False or current_user.is_authenticated %}
+                        <p>{{ comment.content }}</p>
+                    {% endif %}
+                    {% if comment.disabled == True and current_user.is_authenticated %}
+                        <p class="disabled-comment-admin-info">
+                            <span class="glyphicon glyphicon-remove-sign"></span>
+                            <i>This comment has been blocked by admin, visitors can not read and reply this comment.</i>
+                        </p>
+                    {% elif comment.disabled == True %}
+                        <p class="disabled-comment-admin-info">
+                            <span class="glyphicon glyphicon-remove-sign"></span>
+                            <i>This commen has been blocked by admin! </i>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row comment-handle">
+                {% if current_user.is_authenticated %}
+                <div class="col-sm-1 col-sm-offset-8">
+                    {% if comment.disabled == False %}
+                    <a class="btn btn-sm btn-warning"
+                       href="{{ url_for('admin.disable_comment', id=comment.id, page=page) }}">
+                        <span class="glyphicon glyphicon-remove-sign"></span> block
+                    </a>
+                    {% else %}
+                    <a class="btn btn-sm btn-success"
+                       href="{{ url_for('admin.enable_comment', id=comment.id, page=page) }}">
+                        <span class="glyphicon glyphicon-ok-sign"></span> unblock
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="col-sm-1 delete-comment">
+                    <button class="btn btn-sm btn-danger"
+                            onclick="delCommentCfm('{{ url_for('admin.delete_comment', id=comment.id, page=page) }}')">
+                        <span class="glyphicon glyphicon-trash"></span> delete
+                    </button>
+                </div>
+                {% endif %}
+                {% if comment.disabled == False or current_user.is_authenticated %}
+                <div class="col-sm-1 {% if current_user.is_anonymous %}col-sm-offset-10{% endif %}">
+                    <button class="btn btn-sm btn-info" onclick="go_to_reply({{ comment.id }}, '{{ comment.author_name }}')">
+                        <span class="glyphicon glyphicon-comment"></span> reply
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </li>
+        {% endfor %}
+    {% else %}
+        <li class="comment">
+            <div class="comment-content">no comment</div>
+        </li>
+    {% endif %}
+</ul>
+
+<!-- 信息删除确认: For delete a comment confirm -->
+<div class="modal fade" id="delCommentCfmModel">
+    <div class="modal-dialog">
+        <div class="modal-content message_align">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+                <h4 class="modal-title">confirm to delete this comment？</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    It is unrecoverable once deleted, confirm to delete?
+                </p>
+                <p>
+                    (hint: if you don't want to show this comment, block it)
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">cancel</button>
+                <a onclick="" id="delCommentCfmClick" class="btn btn-success" data-dismiss="modal">confirm</a>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
